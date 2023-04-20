@@ -171,7 +171,7 @@ const Products = () => {
               alt={product.title}
               sx={{ objectFit: 'cover', height: '200px' }}
             />
-            <CardContent sx={{ height: 'calc(100% - 200px)' }}>
+            <CardContent sx={{ height: 'calc(100% - 200px)', backgroundColor: '#f2f2f2' }}>
               <Typography gutterBottom variant="h5" component="div">
                 {product.title}
               </Typography>
@@ -221,8 +221,8 @@ const Products = () => {
                   </IconButton>
                 </CardActions>
               </div>
-
             </CardContent>
+
 
           </Card>
         ))}

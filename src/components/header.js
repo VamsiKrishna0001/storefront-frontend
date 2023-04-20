@@ -37,7 +37,7 @@ const Header = () => {
         <Typography variant="h6" textAlign="start" className={classes.title}>
           Storefront
         </Typography>
-        <Typography sx={{ padding: "1rem", textDecoration: "none", color: "white" }} component="a" href="/sign-up" >Products</Typography>
+        <Typography sx={{ padding: "1rem", textDecoration: "none", color: "white" }} component="a" href="/products" >Products</Typography>
         <Typography sx={{ padding: "1rem", textDecoration: "none", color: "white" }} component="a" href="/sign-up" >Collections</Typography>
         <Typography sx={{ padding: "1rem", textDecoration: "none", color: "white" }} component="a" href="/sign-up" >Orders</Typography>
         {/* <Button variant='text' color="error">Products</Button>
