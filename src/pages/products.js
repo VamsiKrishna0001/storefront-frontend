@@ -1,6 +1,10 @@
 import Header from "../components/header";
-import { Card, CardMedia, CardContent, Typography, CardActions, IconButton, TextField } from '@mui/material';
-import { AddShoppingCart } from '@mui/icons-material';
+import { InputAdornment } from '@mui/material';
+import RemoveIcon from '@mui/icons-material/Remove';
+import AddIcon from '@mui/icons-material/Add';
+import { Card, CardMedia, CardContent, Typography, CardActions, IconButton, TextField, Pagination } from '@mui/material';
+import { AddShoppingCart, AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
+import { useState } from "react";
 
 const products = [
   {
@@ -120,11 +124,34 @@ const products = [
 ];
 
 const Products = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 10;
+  const totalPages = Math.ceil(products.length / productsPerPage);
+  const startIndex = (currentPage - 1) * productsPerPage;
+  const endIndex = startIndex + productsPerPage;
+  const currentProducts = products.slice(startIndex, endIndex);
+  const [quantity, setQuantity] = useState(0);
+
+  const handleQuantityChange = (event) => {
+    setQuantity(event.target.value);
+  };
+
+  const handleQuantityIncrease = () => {
+    setQuantity((prevQuantity) => prevQuantity + 1);
+  };
+
+  const handleQuantityDecrease = () => {
+    setQuantity((prevQuantity) => prevQuantity - 1);
+  };
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
   return (
     <>
       <Header />
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', marginTop: '20px' }}>
-        {products.map((product) => (
+        {currentProducts.map((product) => (
           <Card key={product.id} sx={{ maxWidth: 345, margin: '10px' }}>
             <CardMedia
               component="img"
@@ -139,7 +166,43 @@ const Products = () => {
               <Typography variant="body2" color="text.secondary">
                 Price: ${product.price.toFixed(2)}
               </Typography>
-              <TextField label="Quantity" type="number" inputProps={{ min: 0, max: 10, step: 1 }} />
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <TextField
+                  label="Quantity"
+                  type="number"
+                  value={quantity}
+                  onChange={handleQuantityChange}
+                  InputProps={{
+                    disableUnderline: true,
+                    inputProps: {
+                      min: 0,
+                      max: 10,
+                      step: 1,
+                      style: { textAlign: 'center', fontSize: '16px' },
+                    },
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="reduce quantity"
+                          onClick={handleQuantityDecrease}
+                          size="large"
+                          disabled={quantity <= 0}
+                        >
+                          <RemoveIcon />
+                        </IconButton>
+                        <IconButton
+                          aria-label="increase quantity"
+                          onClick={handleQuantityIncrease}
+                          size="large"
+                          disabled={quantity >= 10}
+                        >
+                          <AddIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </div>
             </CardContent>
             <CardActions>
               <IconButton>
@@ -148,6 +211,9 @@ const Products = () => {
             </CardActions>
           </Card>
         ))}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+        <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} />
       </div>
     </>
   )
