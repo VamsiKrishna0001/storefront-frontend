@@ -14,7 +14,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Card } from '@mui/material';
 import Header from '../components/header';
-
+import axios from "axios";
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -31,13 +31,36 @@ function Copyright(props) {
 const theme = createTheme();
 
 const Login = () => {
-  const handleSubmit = (event) => {
+
+  const signInApi = async (data) => {
+
+    let res = await axios.post('http://127.0.0.1:8000/auth/jwt/create', data);
+    if (res.status >= 200 && res.status <= 301) {
+      localStorage.setItem('accessToken', res.data?.access);
+      localStorage.setItem('refreshToken', res.data?.refresh);
+      if (res.data?.access) {
+
+        let res1 = await axios.get('http://127.0.0.1:8000/auth/users/me', {
+          headers: {
+            'Authorization': `JWT ${res.data?.access}`
+          }
+        });
+        console.log("res1 ", res1);
+        if (res1.status >= 200 && res1.status <= 301) {
+          console.log("res1 ", res1.data);
+          localStorage.setItem("usersData", JSON.stringify(res1.data));
+        }
+
+      }
+      window.location.href = "/products"
+    }
+
+  }
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    await signInApi(data);
   };
 
   return (
@@ -62,17 +85,19 @@ const Login = () => {
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
+                size='small'
                 required
                 fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
+                id="username"
+                label="Username"
+                name="username"
+                autoComplete="username"
                 autoFocus
               />
               <TextField
                 margin="normal"
                 required
+                size='small'
                 fullWidth
                 name="password"
                 label="Password"

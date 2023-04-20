@@ -30,6 +30,14 @@ const Header = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  const Logout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('usersData');
+    window.location.href = '/';
+  }
+
   //secondary
   return (
     <AppBar position="static" sx={{ background: 'linear-gradient(180deg, #FF0000 0%, #000000 100%)' }}>
@@ -59,7 +67,7 @@ const Header = () => {
           onClose={handleMenuClose}
         >
           <MenuItem>Account</MenuItem>
-          <MenuItem>Sign Out</MenuItem>
+          <MenuItem onClick={Logout}>Sign Out</MenuItem>
         </Menu>
       </Toolbar>
     </AppBar>
