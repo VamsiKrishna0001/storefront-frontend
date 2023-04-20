@@ -178,10 +178,11 @@ const Products = () => {
               <Typography variant="body2" color="text.secondary">
                 Price: ${product.price.toFixed(2)}
               </Typography>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between", marginTop: "1rem" }}>
                 <TextField
                   label="Quantity"
                   type="number"
+                  size="small"
                   value={quantity}
                   onChange={handleQuantityChange}
                   InputProps={{
@@ -214,13 +215,15 @@ const Products = () => {
                     ),
                   }}
                 />
+                <CardActions>
+                  <IconButton color="primary">
+                    <AddShoppingCart />
+                  </IconButton>
+                </CardActions>
               </div>
+
             </CardContent>
-            <CardActions>
-              <IconButton>
-                <AddShoppingCart />
-              </IconButton>
-            </CardActions>
+
           </Card>
         ))}
       </div>
