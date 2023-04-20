@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const Header = () => {
+const Header = ({ cartItems, count }) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -51,7 +51,7 @@ const Header = () => {
         <Button color="inherit">Collections</Button>
         <Button color="inherit">Orders</Button> */}
         <IconButton color="inherit" href='/cart'>
-          <Badge badgeContent={2} color="error">
+          <Badge badgeContent={count} color="error">
             <ShoppingCartIcon />
           </Badge>
         </IconButton>

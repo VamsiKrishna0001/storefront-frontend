@@ -135,8 +135,11 @@ const Products = () => {
   const startIndex = (currentPage - 1) * productsPerPage;
   const endIndex = startIndex + productsPerPage;
   // const currentProducts = products.slice(startIndex, endIndex);
-  const [quantity, setQuantity] = useState(0);
-  const [cartItems, setCartItems] = useState([{ id: 1, title: 'Product 1', price_with_tax: 10.99, quantity: 2, }, { id: 2, title: 'Product 2', price_with_tax: 19.99, quantity: 1, },]);
+  const [quantity, setQuantity] = useState({});
+  const [cartItems, setCartItems] = useState([]);
+  const initialCart = [{ id: "", title: "", price_with_tax: "", quantity: "" }];
+  const [countTotalCartItems, setTotalCartItems] = useState(0);
+  // const [cartItems, setCartItems] = useState[initialCart];
 
   // const handleQuantityChange = (index, value) => {
   //   const newCartItems = [...cartItems];
@@ -185,6 +188,11 @@ const Products = () => {
         }
       }
       createCartApi(data);
+    } else {
+      const checkItems = async () => {
+        getCartItems();
+      }
+      checkItems();
     }
     const productList = async () => {
       let res = await axios.get('http://127.0.0.1:8000/store/products/');
@@ -197,16 +205,41 @@ const Products = () => {
     }
     productList();
   }, [])
-  const handleQuantityChange = (event) => {
-    setQuantity(event.target.value);
+  const handleQuantityChange = (event, id) => {
+    const newQuantity = parseInt(event.target.value);
+    setQuantity((prevQuantities) => ({
+      ...prevQuantities,
+      [id]: newQuantity,
+    }));
+    console.log(" setQuantity(event.target.value);", event.target.value, id);
+    // setQuantity(event.target.value);
   };
 
-  const handleQuantityIncrease = () => {
-    setQuantity((prevQuantity) => prevQuantity + 1);
+  // const handleQuantityIncrease = () => {
+  //   setQuantity((prevQuantity) => prevQuantity + 1);
+  // };
+  const handleQuantityIncrease = (productId) => {
+    setQuantity(prevState => {
+      const newQuantity = { ...prevState };
+      if (!newQuantity[productId]) {
+        newQuantity[productId] = 0;
+      }
+      newQuantity[productId] = Math.min(newQuantity[productId] + 1, 10);
+      return newQuantity;
+    });
   };
 
-  const handleQuantityDecrease = () => {
-    setQuantity((prevQuantity) => prevQuantity - 1);
+  // const handleQuantityDecrease = () => {
+  //   setQuantity((prevQuantity) => prevQuantity - 1);
+  // };
+  const handleQuantityDecrease = (productId) => {
+    setQuantity(prevQuantity => {
+      const newQuantity = { ...prevQuantity };
+      if (newQuantity[productId] > 0) {
+        newQuantity[productId] -= 1;
+      }
+      return newQuantity;
+    });
   };
 
   const handlePageChange = async (event, value) => {
@@ -222,10 +255,47 @@ const Products = () => {
   //   );
   // });
 
+  const getCartItems = async () => {
+    const res1 = await axios.get('http://127.0.0.1:8000/store/carts/6d083216-0fcb-4f2a-a547-4575a841c5ba/items/');
+    if (res1.status >= 200 && res1.status <= 301) {
+      const len = res1.data.length;
+      setTotalCartItems(len);
+      setCartItems(res1.data)
+      let itemArr = [];
+      for await (const pr of res1.data) {
+        console.log("pr..v.vfv ", pr);
+        setQuantity(prevState => {
+          const newQuantity = { ...prevState };
+          console.log(pr.product.id);
+          if (!newQuantity[pr.product.id]) {
+            newQuantity[pr.product.id] = 0;
+          }
+          newQuantity[pr.product.id] = pr.quantity;
+          return newQuantity;
+        })
+      }
+    }
+  }
+
+  const addToCartApi = async (data) => {
+    let res = await axios.post('http://127.0.0.1:8000/store/carts/6d083216-0fcb-4f2a-a547-4575a841c5ba/items/', data);
+    if (res.status >= 200 && res.status <= 301) {
+      await getCartItems();
+    }
+  }
+
+  const addToCart = async (product) => {
+    let data = {
+      product_id: product.id,
+      quantity: quantity[product.id]
+    }
+    await addToCartApi(data);
+  }
+
 
   return (
     <>
-      <Header />
+      <Header cartItems={cartItems} count={countTotalCartItems} />
       {products.length === 0 ?
         (<Typography>No Products Available</Typography>) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginTop: '20px', padding: "0 3rem" }}>
@@ -248,13 +318,14 @@ const Products = () => {
                   <Typography variant="body2" color="text.secondary">
                     save 40% : ${product.price_with_tax.toFixed(2)}
                   </Typography>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between", marginTop: "1rem" }}>
+                  <div id={`quan-${product.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between", marginTop: "1rem" }}>
                     <TextField
                       label="Quantity"
                       type="number"
                       size="small"
-                      value={quantity}
-                      onChange={handleQuantityChange}
+                      // value={quantity}
+                      value={quantity[product.id] || 0}
+                      onChange={(e) => handleQuantityChange(e, product.id)}
                       InputProps={{
                         disableUnderline: true,
                         inputProps: {
@@ -267,17 +338,17 @@ const Products = () => {
                           <InputAdornment position="end">
                             <IconButton
                               aria-label="reduce quantity"
-                              onClick={handleQuantityDecrease}
+                              onClick={() => handleQuantityDecrease(product.id)}
                               size="large"
-                              disabled={quantity <= 0}
+                              disabled={quantity[product.id] <= 0}
                             >
                               <RemoveIcon />
                             </IconButton>
                             <IconButton
                               aria-label="increase quantity"
-                              onClick={handleQuantityIncrease}
+                              onClick={() => handleQuantityIncrease(product.id)}
                               size="large"
-                              disabled={quantity >= 10}
+                              disabled={quantity[product.id] >= 10}
                             >
                               <AddIcon />
                             </IconButton>
@@ -286,7 +357,7 @@ const Products = () => {
                       }}
                     />
                     <CardActions>
-                      <IconButton color="primary">
+                      <IconButton color="primary" onClick={() => addToCart(product)}>
                         <AddShoppingCart />
                       </IconButton>
                     </CardActions>
