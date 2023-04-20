@@ -13,6 +13,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Card } from '@mui/material';
+import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 function Copyright(props) {
   return (
@@ -29,14 +31,46 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-export default function SignUp() {
-  const handleSubmit = (event) => {
+const SignUp = () => {
+  // const initialValues = {
+  //   "username": "",
+  //   "password": "",
+  //   "email": "",
+  //   "first_name": "",
+  //   "last_name": ""
+  // }
+  // const [formValues, setFormValues] = React.useState(initialValues);
+
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormValues({ ...formValues, [name]: value });
+  // };
+
+  // const submit = () => {
+  //   console.log("formvalues.. ", formValues);
+  // }
+
+  const registerApi = async (data) => {
+
+    let res = await axios.post('http://127.0.0.1:8000/auth/users/', data);
+    if (res.status === 201) {
+      window.location.href = "/"
+    }
+
+    // http://127.0.0.1:8000/auth/users/
+  }
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
       email: data.get('email'),
       password: data.get('password'),
+      first_name: data.get('first_name'),
+      last_name: data.get('last_name'),
+      username: data.get('username'),
     });
+    await registerApi(data);
   };
 
   return (
@@ -60,39 +94,61 @@ export default function SignUp() {
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   <TextField
-                    autoComplete="given-name"
-                    name="firstName"
+                    size='small'
                     required
                     fullWidth
-                    id="firstName"
+                    id="username"
+                    label="User Name"
+                    name="username"
+                  // value={formValues.username}
+                  // onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    size='small'
+                    autoComplete="given-name"
+                    name="first_name"
+                    required
+                    fullWidth
+                    id="first_name"
                     label="First Name"
+                    // value={formValues.first_name}
+                    // onChange={handleChange}
                     autoFocus
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
+                    size='small'
                     required
                     fullWidth
-                    id="lastName"
+                    id="last_name"
                     label="Last Name"
-                    name="lastName"
+                    name="last_name"
                     autoComplete="family-name"
+                  // value={formValues.last_name}
+                  // onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    size='small'
                     required
                     fullWidth
                     id="email"
                     label="Email Address"
                     name="email"
                     autoComplete="email"
+                  // value={formValues.email}
+                  // onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    size='small'
                     required
                     fullWidth
                     name="password"
@@ -100,6 +156,8 @@ export default function SignUp() {
                     type="password"
                     id="password"
                     autoComplete="new-password"
+                  // value={formValues.password}
+                  // onChange={handleChange}
                   />
                 </Grid>
               </Grid>
@@ -125,3 +183,5 @@ export default function SignUp() {
     </ThemeProvider>
   );
 }
+
+export default SignUp;
