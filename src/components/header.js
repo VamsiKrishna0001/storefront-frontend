@@ -32,7 +32,7 @@ const Header = () => {
   };
   //secondary
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ background: 'linear-gradient(180deg, #FF0000 0%, #000000 100%)' }}>
       <Toolbar>
         <Typography variant="h6" textAlign="start" className={classes.title}>
           Storefront

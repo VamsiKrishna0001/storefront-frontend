@@ -5,6 +5,8 @@ import AddIcon from '@mui/icons-material/Add';
 import { Card, CardMedia, CardContent, Typography, CardActions, IconButton, TextField, Pagination } from '@mui/material';
 import { AddShoppingCart, AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
 import { useState } from "react";
+import SideBar from "../components/sidepanle";
+import Footer from "../components/footer";
 
 const products = [
   {
@@ -147,19 +149,29 @@ const Products = () => {
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
+
+  // const currentProductsFilter = products.filter((product) => {
+  //   return (
+  //     product.price >= filters.price.min &&
+  //     product.price <= filters.price.max &&
+  //     (filters.category === "" || product.category === filters.category)
+  //   );
+  // });
+
   return (
     <>
       <Header />
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', marginTop: '20px' }}>
-        {currentProducts.map((product) => (
-          <Card key={product.id} sx={{ maxWidth: 345, margin: '10px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginTop: '20px', padding: "0 3rem" }}>
+        {currentProducts.map((product, index) => (
+          <Card key={product.id} sx={{ height: '100%' }}>
             <CardMedia
               component="img"
               height="140"
-              image={product.image}
+              image={`https://picsum.photos/${index + 1000}`}
               alt={product.title}
+              sx={{ objectFit: 'cover', height: '200px' }}
             />
-            <CardContent>
+            <CardContent sx={{ height: 'calc(100% - 200px)' }}>
               <Typography gutterBottom variant="h5" component="div">
                 {product.title}
               </Typography>
@@ -212,9 +224,10 @@ const Products = () => {
           </Card>
         ))}
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '20px' }}>
         <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} />
       </div>
+      <Footer />
     </>
   )
 }
