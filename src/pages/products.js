@@ -176,7 +176,10 @@ const Products = () => {
                 {product.title}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Price: ${product.price.toFixed(2)}
+                price: <span style={{ textDecoration: "line-through" }}>${((product.price) / (1 - 0.40)).toFixed()}</span>
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                save 40% : ${product.price.toFixed(2)}
               </Typography>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between", marginTop: "1rem" }}>
                 <TextField
