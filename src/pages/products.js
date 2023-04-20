@@ -133,6 +133,29 @@ const Products = () => {
   const endIndex = startIndex + productsPerPage;
   const currentProducts = products.slice(startIndex, endIndex);
   const [quantity, setQuantity] = useState(0);
+  const [cartItems, setCartItems] = useState([{ id: 1, title: 'Product 1', price: 10.99, quantity: 2, }, { id: 2, title: 'Product 2', price: 19.99, quantity: 1, },]);
+
+  // const handleQuantityChange = (index, value) => {
+  //   const newCartItems = [...cartItems];
+  //   newCartItems[index].quantity = value;
+  //   setCartItems(newCartItems);
+  // };
+
+  // const handleQuantityDecrease = (index) => {
+  //   const newCartItems = [...cartItems];
+  //   if (newCartItems[index].quantity > 0) {
+  //     newCartItems[index].quantity -= 1;
+  //     setCartItems(newCartItems);
+  //   }
+  // };
+
+  // const handleQuantityIncrease = (index) => {
+  //   const newCartItems = [...cartItems];
+  //   if (newCartItems[index].quantity < 10) {
+  //     newCartItems[index].quantity += 1;
+  //     setCartItems(newCartItems);
+  //   }
+  // };
 
   const handleQuantityChange = (event) => {
     setQuantity(event.target.value);

@@ -38,12 +38,11 @@ const Header = () => {
           Storefront
         </Typography>
         <Typography sx={{ padding: "1rem", textDecoration: "none", color: "white" }} component="a" href="/products" >Products</Typography>
-        <Typography sx={{ padding: "1rem", textDecoration: "none", color: "white" }} component="a" href="/sign-up" >Collections</Typography>
         <Typography sx={{ padding: "1rem", textDecoration: "none", color: "white" }} component="a" href="/sign-up" >Orders</Typography>
         {/* <Button variant='text' color="error">Products</Button>
         <Button color="inherit">Collections</Button>
         <Button color="inherit">Orders</Button> */}
-        <IconButton color="inherit">
+        <IconButton color="inherit" href='/cart'>
           <Badge badgeContent={2} color="error">
             <ShoppingCartIcon />
           </Badge>
