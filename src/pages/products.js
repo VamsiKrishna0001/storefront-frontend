@@ -137,7 +137,6 @@ const Products = () => {
   // const currentProducts = products.slice(startIndex, endIndex);
   const [quantity, setQuantity] = useState({});
   const [cartItems, setCartItems] = useState([]);
-  const initialCart = [{ id: "", title: "", price_with_tax: "", quantity: "" }];
   const [countTotalCartItems, setTotalCartItems] = useState(0);
   // const [cartItems, setCartItems] = useState[initialCart];
 
@@ -211,8 +210,6 @@ const Products = () => {
       ...prevQuantities,
       [id]: newQuantity,
     }));
-    console.log(" setQuantity(event.target.value);", event.target.value, id);
-    // setQuantity(event.target.value);
   };
 
   // const handleQuantityIncrease = () => {
@@ -224,7 +221,7 @@ const Products = () => {
       if (!newQuantity[productId]) {
         newQuantity[productId] = 0;
       }
-      newQuantity[productId] = Math.min(newQuantity[productId] + 1, 10);
+      newQuantity[productId] = Math.min(newQuantity[productId] + 1, 50);
       return newQuantity;
     });
   };
@@ -261,12 +258,9 @@ const Products = () => {
       const len = res1.data.length;
       setTotalCartItems(len);
       setCartItems(res1.data)
-      let itemArr = [];
       for await (const pr of res1.data) {
-        console.log("pr..v.vfv ", pr);
         setQuantity(prevState => {
           const newQuantity = { ...prevState };
-          console.log(pr.product.id);
           if (!newQuantity[pr.product.id]) {
             newQuantity[pr.product.id] = 0;
           }
@@ -330,7 +324,7 @@ const Products = () => {
                         disableUnderline: true,
                         inputProps: {
                           min: 0,
-                          max: 10,
+                          max: 50,
                           step: 1,
                           style: { textAlign: 'center', fontSize: '16px' },
                         },
@@ -348,7 +342,7 @@ const Products = () => {
                               aria-label="increase quantity"
                               onClick={() => handleQuantityIncrease(product.id)}
                               size="large"
-                              disabled={quantity[product.id] >= 10}
+                              disabled={quantity[product.id] >= 50}
                             >
                               <AddIcon />
                             </IconButton>

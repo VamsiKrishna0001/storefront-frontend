@@ -46,7 +46,7 @@ const Header = ({ cartItems, count }) => {
           Storefront
         </Typography>
         <Typography sx={{ padding: "1rem", textDecoration: "none", color: "white" }} component="a" href="/products" >Products</Typography>
-        <Typography sx={{ padding: "1rem", textDecoration: "none", color: "white" }} component="a" href="/sign-up" >Orders</Typography>
+        <Typography sx={{ padding: "1rem", textDecoration: "none", color: "white" }} component="a" href="/orders" >Orders</Typography>
         {/* <Button variant='text' color="error">Products</Button>
         <Button color="inherit">Collections</Button>
         <Button color="inherit">Orders</Button> */}
