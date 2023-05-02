@@ -138,6 +138,7 @@ const Products = () => {
   const [quantity, setQuantity] = useState({});
   const [cartItems, setCartItems] = useState([]);
   const [countTotalCartItems, setTotalCartItems] = useState(0);
+  const cartId = localStorage.getItem('cartId');
   // const [cartItems, setCartItems] = useState[initialCart];
 
   // const handleQuantityChange = (index, value) => {
@@ -253,7 +254,7 @@ const Products = () => {
   // });
 
   const getCartItems = async () => {
-    const res1 = await axios.get('http://127.0.0.1:8000/store/carts/6d083216-0fcb-4f2a-a547-4575a841c5ba/items/');
+    const res1 = await axios.get(`http://127.0.0.1:8000/store/carts/${cartId}/items/`);
     if (res1.status >= 200 && res1.status <= 301) {
       const len = res1.data.length;
       setTotalCartItems(len);
@@ -272,7 +273,7 @@ const Products = () => {
   }
 
   const addToCartApi = async (data) => {
-    let res = await axios.post('http://127.0.0.1:8000/store/carts/6d083216-0fcb-4f2a-a547-4575a841c5ba/items/', data);
+    let res = await axios.post(`http://127.0.0.1:8000/store/carts/${cartId}/items/`, data);
     if (res.status >= 200 && res.status <= 301) {
       await getCartItems();
     }

@@ -41,6 +41,8 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [quantities, setQuantities] = useState({});
   const [totalPrice, setTotalPrice] = useState(0);
+  const cartId = localStorage.getItem('cartId');
+  const accessToken = localStorage.getItem('accessToken');
 
   const handleQuantityChange = (event, id) => {
     const newQuantity = parseInt(event.target.value);
@@ -51,35 +53,55 @@ const Cart = () => {
   };
 
 
-  const handleQuantityIncrease = (productId) => {
+  const handleQuantityIncrease = async (productId, itemId) => {
+    let data = {
+      id: itemId,
+    };
     setQuantities(prevState => {
       const newQuantity = { ...prevState };
       if (!newQuantity[productId]) {
         newQuantity[productId] = 0;
       }
       newQuantity[productId] = Math.min(newQuantity[productId] + 1, 50);
+      data = {
+        ...data,
+        quantity: newQuantity[productId]
+      }
+
       return newQuantity;
     });
+    await updateCartItems(data);
+
   };
 
-  const handleQuantityDecrease = (productId) => {
+  const handleQuantityDecrease = async (productId, itemId) => {
+    let data = {
+      id: itemId,
+    };
     setQuantities(prevQuantity => {
       const newQuantity = { ...prevQuantity };
       if (newQuantity[productId] > 0) {
         newQuantity[productId] -= 1;
       }
+      data = {
+        ...data,
+        quantity: newQuantity[productId]
+      }
       return newQuantity;
     });
+    await updateCartItems(data);
   };
-  const handleDeleteItem = (index) => {
+  const handleDeleteItem = async (index, productId) => {
     const newCartItems = [...cartItems];
     newCartItems.splice(index, 1);
+    await removeItemFromCart(productId);
+
     setCartItems(newCartItems);
     setQuantities(newCartItems.map((item) => item.quantity));
   };
 
-  const getCartItems = async () => {
-    const res1 = await axios.get('http://127.0.0.1:8000/store/carts/6d083216-0fcb-4f2a-a547-4575a841c5ba/');
+  const getCartItems = async (cartId) => {
+    const res1 = await axios.get(`http://127.0.0.1:8000/store/carts/${cartId}/`);
     if (res1.status >= 200 && res1.status <= 301) {
       setCartItems(res1.data.items);
       setTotalPrice(res1.data.total_price);
@@ -96,15 +118,54 @@ const Cart = () => {
     }
   }
 
+  const updateCartItems = async (value) => {
+    console.log("value, v", value);
+    const res1 = await axios.patch(`http://127.0.0.1:8000/store/carts/${cartId}/items/${value.id}/`, { quantity: value.quantity });
+    if (res1.status >= 200 && res1.status <= 301) {
+      await getCartItems(cartId);
+    }
+  }
+
+  const removeItemFromCart = async (id) => {
+    const res1 = await axios.delete(`http://127.0.0.1:8000/store/carts/${cartId}/items/${id}`);
+    if (res1.status >= 200 && res1.status <= 301) {
+      await getCartItems(cartId);
+    }
+  }
+
+  const createCartApi = async () => {
+    let res = await axios.post('http://127.0.0.1:8000/store/carts/');
+    if (res.status >= 200 && res.status <= 301) {
+      if (res.data?.id) {
+        console.log("res.data?.id", res.data?.id);
+        localStorage.setItem("cartId", res.data?.id);
+        await getCartItems(res.data?.id);
+      }
+    }
+  }
+  const createOrderApi = async (data) => {
+    let res = await axios.post('http://127.0.0.1:8000/store/orders/', data, {
+      headers: {
+        'Authorization': `JWT ${accessToken}`
+      }
+    });
+    if (res.status >= 200 && res.status <= 301) {
+      await createCartApi();
+    }
+  }
+
   useEffect(() => {
     const getCartList = async () => {
-      await getCartItems();
+      await getCartItems(cartId);
     }
     getCartList();
   }, [])
 
-  const handleCheckout = () => {
-    alert('Checkout button clicked!');
+  const handleCheckout = async () => {
+    let data = {
+      cart_id: cartId
+    }
+    await createOrderApi(data);
   };
 
   return (
@@ -151,7 +212,7 @@ const Cart = () => {
                             <InputAdornment position="start">
                               <IconButton
                                 aria-label="reduce quantity"
-                                onClick={() => handleQuantityDecrease(item.product.id)}
+                                onClick={() => handleQuantityDecrease(item.product.id, item.id)}
                                 size="large"
                                 disabled={quantities[item.product.id] <= 0}
                               >
@@ -164,7 +225,7 @@ const Cart = () => {
                             <InputAdornment position="end">
                               <IconButton
                                 aria-label="increase quantity"
-                                onClick={() => handleQuantityIncrease(item.product.id)}
+                                onClick={() => handleQuantityIncrease(item.product.id, item.id)}
                                 size="large"
                                 disabled={quantities[item.product.id] >= 50}
                               >
@@ -175,7 +236,7 @@ const Cart = () => {
                           ),
                         }}
                       />
-                      <Button variant="contained" color="secondary" startIcon={<DeleteIcon />} onClick={() => handleDeleteItem(index)} className={classes.deleteButton}>
+                      <Button variant="contained" color="secondary" startIcon={<DeleteIcon />} onClick={() => handleDeleteItem(index, item.id)} className={classes.deleteButton}>
                         Delete
                       </Button>
                     </div>

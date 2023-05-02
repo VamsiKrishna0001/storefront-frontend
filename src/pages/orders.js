@@ -1,8 +1,9 @@
 import { Container, Grid, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import Header from "../components/header";
 import Footer from "../components/footer";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -30,10 +31,26 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const cartItems = [{ id: 1, title: 'Product 1', price_with_tax: 10.99, quantity: 2, }, { id: 2, title: 'Product 2', price_with_tax: 19.99, quantity: 1, },];
+// const cartItems = [{ id: 1, title: 'Product 1', price_with_tax: 10.99, quantity: 2, }, { id: 2, title: 'Product 2', price_with_tax: 19.99, quantity: 1, },];
 const Orders = () => {
   const classes = useStyles();
-  const [orders, setOrder] = useState(cartItems);
+  const [orders, setOrderItems] = useState([]);
+  const accessToken = localStorage.getItem('accessToken');
+
+  const getOrders = async () => {
+    const res = await axios.get('http://127.0.0.1:8000/store/orders/', {
+      headers: {
+        'Authorization': `JWT ${accessToken}`
+      }
+    });
+    if (res.status >= 200 && res.status <= 301) {
+      setOrderItems(res.data);
+    }
+  }
+
+  useEffect(() => {
+    getOrders();
+  }, [])
 
 
   return (
@@ -49,21 +66,23 @@ const Orders = () => {
           <Grid container spacing={2}>
             {
               orders.map((item, index) => (
-                <Grid item xs={12} key={item.id}>
-                  <Grid container alignItems="center" spacing={2}>
-                    <Grid item>
-                      <img src={`https://picsum.photos/${index + 200}`} alt={item.title} className={classes.itemImage} />
-                    </Grid>
-                    <Grid item xs>
-                      <Typography variant="h6" className={classes.itemTitle}>
-                        {item.title}
-                      </Typography>
-                      <Typography variant="body2" className={classes.itemPrice}>
-                        Price: ${item.price_with_tax}
-                      </Typography>
+                item.items.map((productItem, index) => (
+                  <Grid item xs={12} key={item.id}>
+                    <Grid container alignItems="center" spacing={2}>
+                      <Grid item>
+                        <img src={`https://picsum.photos/${index + 200}`} alt={productItem.product.title} className={classes.itemImage} />
+                      </Grid>
+                      <Grid item xs>
+                        <Typography variant="h6" className={classes.itemTitle}>
+                          {productItem.product.title}
+                        </Typography>
+                        <Typography variant="body2" className={classes.itemPrice}>
+                          Price: ${productItem.unit_price}
+                        </Typography>
+                      </Grid>
                     </Grid>
                   </Grid>
-                </Grid>
+                ))
               ))
             }
           </Grid>

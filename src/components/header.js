@@ -38,6 +38,10 @@ const Header = ({ cartItems, count }) => {
     window.location.href = '/';
   }
 
+  const handleToAccount = () => {
+    window.location.href = '/account';
+  }
+
   //secondary
   return (
     <AppBar position="static" sx={{ background: 'linear-gradient(180deg, #FF0000 0%, #000000 100%)' }}>
@@ -66,7 +70,7 @@ const Header = ({ cartItems, count }) => {
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
         >
-          <MenuItem>Account</MenuItem>
+          <MenuItem onClick={handleToAccount}>Account</MenuItem>
           <MenuItem onClick={Logout}>Sign Out</MenuItem>
         </Menu>
       </Toolbar>

@@ -7,7 +7,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
-
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -50,6 +50,7 @@ const useStyles = makeStyles((theme) => ({
 const Profile = () => {
   const classes = useStyles();
   const userData = JSON.parse(localStorage.getItem("usersData"));
+  const accessToken = localStorage.getItem('accessToken');
   const initialValues = {
     email: userData.email,
     first_name: userData.first_name,
@@ -57,18 +58,31 @@ const Profile = () => {
     username: userData.username
   }
 
-  console.log("userData", userData.id);
-
-  console.log("initialValues", initialValues);
   const [formValues, setFormValues] = useState(initialValues);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
   };
 
-  // const submit = () => {
-  //   console.log("formvalues.. ", formValues);
-  // }
+  const updateProfileApi = async (data) => {
+    let res = await axios.put('http://127.0.0.1:8000/auth/users/me/', data, {
+      headers: {
+        'Authorization': `JWT ${accessToken}`
+      }
+    })
+    if (res.status >= 200 && res.status <= 301) {
+      localStorage.setItem("usersData", JSON.stringify(res.data));
+    }
+  }
+
+  const submit = async () => {
+    let data = {
+      email: formValues.email,
+      first_name: formValues.first_name,
+      last_name: formValues.last_name
+    }
+    await updateProfileApi(data);
+  }
 
   // Generate a random image URL using the Unsplash API
   const image = `https://source.unsplash.com/random/${Math.floor(Math.random() * 1000) + 500}`;
@@ -91,6 +105,7 @@ const Profile = () => {
                 id="username"
                 label="Username"
                 name='username'
+                disabled
                 variant="outlined"
                 value={formValues.username}
                 fullWidth
@@ -135,6 +150,7 @@ const Profile = () => {
                 className={classes.button}
                 variant="contained"
                 color="primary"
+                onClick={submit}
               >
                 Save
               </Button>
